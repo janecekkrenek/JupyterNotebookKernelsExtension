@@ -9,20 +9,22 @@ ENV HOME /home/${NB_USER}
 
 USER root
 # Praparation
-RUN wget https://packages.microsoft.com/config/ubuntu/18.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb \
-    && wget https://github.com/SpencerPark/IJava/releases/download/v1.3.0/ijava-1.3.0.zip -O ijava-kernel.zip
+RUN wget https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb \
+     && wget https://github.com/SpencerPark/IJava/releases/download/v1.3.0/ijava-1.3.0.zip -O ijava-kernel.zip
 
 RUN dpkg -i packages-microsoft-prod.deb
+RUN apt-get upgrade -y
 
-# Install .NET Core 3.1 SDK and Java SDK 11
+# Install .NET Core and Java SDKs
 RUN apt-get update \
-    && apt-get install -y apt-utils \
-    && apt-get install -y apt-transport-https \
-    && apt-get install -y dotnet-sdk-3.1 \
-    && apt-get install -y openjdk-11-jdk 
-    
+     && apt-get install -y apt-utils \
+     && apt-get install -y apt-transport-https \
+     && apt-get install -y dotnet-sdk-7.0 \
+     && apt-get install -y openjdk-17-jdk 
+
 # Verification of installed Java SDK
 RUN java -version
+
 # Verification of installed .NET Core SDK 
 RUN dotnet --version
 
@@ -31,8 +33,8 @@ RUN dotnet tool install -g Microsoft.dotnet-interactive
 
 # Unpack and install the JAVA kernel to Jupyter
 RUN unzip ijava-kernel.zip -d ijava-kernel \
-  && cd ijava-kernel \
-  && python3 install.py --sys-prefix
+    && cd ijava-kernel \
+    && python3 install.py --sys-prefix
 
 # Change permission for newly added things
 RUN chown -R ${NB_UID} ${HOME}
